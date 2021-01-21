@@ -29,15 +29,15 @@ defmodule Ex6502.CPUTest do
       assert {:error, :too_large} == CPU.set(:a, 0x89AC)
     end
 
-    test "stepping the program counter" do
+    test "advancing the program counter" do
       {:ok, _} = CPU.set(:pc, 0x8000)
-      assert {:ok, 0x8001} == CPU.step_pc()
-      assert {:ok, 0x8004} == CPU.step_pc(3)
+      assert {:ok, 0x8001} == CPU.advance_pc()
+      assert {:ok, 0x8004} == CPU.advance_pc(3)
     end
 
-    test "trying to step the program counter out of bounds" do
+    test "trying to advance the program counter out of bounds" do
       {:ok, _} = CPU.set(:pc, 0xFFFF)
-      assert {:error, :out_of_bounds} == CPU.step_pc()
+      assert {:error, :out_of_bounds} == CPU.advance_pc()
     end
   end
 

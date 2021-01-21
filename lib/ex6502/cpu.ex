@@ -60,8 +60,8 @@ defmodule Ex6502.CPU do
     GenServer.call(__MODULE__, {:flag, flag})
   end
 
-  def step_pc(amount \\ 1) do
-    GenServer.call(__MODULE__, {:step_pc, amount})
+  def advance_pc(amount \\ 1) do
+    GenServer.call(__MODULE__, {:advance_pc, amount})
   end
 
   # Server API
@@ -103,7 +103,7 @@ defmodule Ex6502.CPU do
   end
 
   @impl true
-  def handle_call({:step_pc, amount}, _from, state) do
+  def handle_call({:advance_pc, amount}, _from, state) do
     state = Map.update(state, :pc, 0, &(&1 + amount))
 
     if state.pc <= 0xFFFF do

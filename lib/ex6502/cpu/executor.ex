@@ -24,7 +24,7 @@ defmodule Ex6502.CPU.Executor do
     pc = CPU.get(:pc)
     value = Memory.get(pc + 1)
     CPU.set(:a, value)
-    CPU.step_pc(2)
+    CPU.advance_pc(2)
 
     # is bit 7 a 1?
     CPU.set_flag(:n, (value &&& 1 <<< 7) >>> 7)
