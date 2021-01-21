@@ -76,7 +76,6 @@ defmodule Ex6502.Memory do
 
   @impl true
   def handle_call({:load, location, values}, _from, memory) do
-    # TODO: ensure all values are 8 bits
     values
     |> ensure_all_are_8_bit()
     |> case do

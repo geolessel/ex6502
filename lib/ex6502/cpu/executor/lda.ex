@@ -7,8 +7,9 @@ defmodule Ex6502.CPU.Executor.LDA do
   Transfer data from memory to the accumulator.
 
   ## Flags
-    - Negative: 1 if bit 7 of accumulator is set, 0 otherwise
-    - Zero:     1 if accumulator is zero, 0 otherwise
+
+  - Negative: 1 if bit 7 of accumulator is set, 0 otherwise
+  - Zero:     1 if accumulator is zero, 0 otherwise
   """
 
   alias Ex6502.{CPU, Memory}
@@ -49,6 +50,68 @@ defmodule Ex6502.CPU.Executor.LDA do
 
     CPU.set(:a, value)
     CPU.advance_pc(3)
+    set_flags(value)
+  end
+
+  # zero-page
+  def execute(0xA5) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.get()
+      |> Memory.get()
+
+    CPU.set(:a, value)
+    CPU.advance_pc(2)
+    set_flags(value)
+  end
+
+  # x-indexed zero-page
+  def execute(0xB5) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.get()
+      |> Kernel.+(CPU.get(:x))
+      |> Memory.get()
+
+    CPU.set(:a, value)
+    CPU.advance_pc(2)
+    set_flags(value)
+  end
+
+  # zero-page indirect
+  def execute(0xB2) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.get()
+      |> Memory.absolute()
+
+    CPU.set(:a, value)
+    CPU.advance_pc(2)
+    set_flags(value)
+  end
+
+  # x-indexed zero page indirect
+  def execute(0xA1) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.get()
+      |> Memory.absolute(CPU.get(:x))
+
+    CPU.set(:a, value)
+    CPU.advance_pc(2)
+    set_flags(value)
+  end
+
+  # zero-page indirect y-indexed
+  def execute(0xB1) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.get()
+      |> Kernel.+(CPU.get(:y))
+      |> Memory.absolute()
+
+    CPU.set(:a, value)
+    CPU.advance_pc(2)
     set_flags(value)
   end
 
