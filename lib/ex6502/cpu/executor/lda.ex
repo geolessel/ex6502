@@ -1,15 +1,17 @@
 defmodule Ex6502.CPU.Executor.LDA do
   @moduledoc """
+  Load accumulator (register a) from memory
+
   ## Operation
 
   M -> A
 
-  Transfer data from memory to the accumulator.
+  Load data from memory to the accumulator.
 
   ## Flags
 
-  - Negative: 1 if bit 7 of accumulator is set, 0 otherwise
-  - Zero:     1 if accumulator is zero, 0 otherwise
+  - Zero:     1 if accumulator is zero; 0 otherwise
+  - Negative: 1 if bit 7 of accumulator is set; 0 otherwise
   """
 
   alias Ex6502.{CPU, Memory}
