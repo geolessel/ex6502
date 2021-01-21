@@ -27,8 +27,10 @@ defmodule Ex6502.CPU do
   """
 
   use GenServer
+  use Bitwise
 
   @initial_registers %{a: 0, x: 0, y: 0, sp: 0x01FF, p: 0, pc: 0xFFFC}
+  @flags %{c: 0, z: 1, i: 2, d: 3, b: 4, v: 6, n: 7}
 
   # Client API
 
@@ -50,6 +52,14 @@ defmodule Ex6502.CPU do
 
   def set(_register, _too_large), do: {:error, :too_large}
 
+  def set_flag(flag, value) do
+    GenServer.call(__MODULE__, {:set_flag, flag, value})
+  end
+
+  def flag(flag) do
+    GenServer.call(__MODULE__, {:flag, flag})
+  end
+
   def step_pc(amount \\ 1) do
     GenServer.call(__MODULE__, {:step_pc, amount})
   end
@@ -70,6 +80,26 @@ defmodule Ex6502.CPU do
   def handle_call({:set, register, value}, _from, state) do
     state = Map.put(state, register, value)
     {:reply, {:ok, value}, state}
+  end
+
+  @impl true
+  def handle_call({:set_flag, flag, value}, _from, state) do
+    pos = @flags[flag]
+
+    state =
+      if value == false || value == 0 do
+        Map.put(state, :p, state.p &&& ~~~(1 <<< pos))
+      else
+        Map.put(state, :p, state.p ||| 1 <<< pos)
+      end
+
+    {:reply, {:ok, value}, state}
+  end
+
+  @impl true
+  def handle_call({:flag, flag}, _from, state) do
+    status = (state.p &&& 1 <<< @flags[flag]) >>> @flags[flag]
+    {:reply, status == 1, state}
   end
 
   @impl true

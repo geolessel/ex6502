@@ -51,7 +51,7 @@ defmodule Ex6502.Memory do
 
   @impl true
   def handle_call({:get, location}, _from, memory) do
-    {:reply, {:ok, Enum.at(memory, location)}, memory}
+    {:reply, Enum.at(memory, location), memory}
   end
 
   @impl true
