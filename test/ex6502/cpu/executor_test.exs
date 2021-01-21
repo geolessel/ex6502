@@ -18,7 +18,26 @@ defmodule Ex6502.CPU.ExecutorTest do
       assert 0x8002 == CPU.get(:pc)
     end
 
-    test "$A9 immediate flags" do
+    test "$AD absolute" do
+      Memory.load(0x8000, [0xAD, 0x53, 0xA9])
+      Memory.set(0xA953, 0x63)
+      CPU.set(:pc, 0x8000)
+      Executor.execute(Memory.get(0x8000))
+      assert 0x63 == CPU.get(:a)
+      assert 0x8003 == CPU.get(:pc)
+    end
+
+    test "$BD x-indexed absolute" do
+      Memory.load(0x8000, [0xBD, 0x53, 0xA9])
+      Memory.set(0xA955, 0x9C)
+      CPU.set(:pc, 0x8000)
+      CPU.set(:x, 0x02)
+      Executor.execute(Memory.get(0x8000))
+      assert 0x9C == CPU.get(:a)
+      assert 0x8003 == CPU.get(:pc)
+    end
+
+    test "flags" do
       Memory.load(0x8000, [0xA9, 0x53])
       CPU.set(:pc, 0x8000)
       Executor.execute(Memory.get(0x8000))

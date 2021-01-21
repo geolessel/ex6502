@@ -1,5 +1,6 @@
 defmodule Ex6502.Memory do
   use GenServer
+  use Bitwise
 
   @max_size 0xFFFF
 
@@ -19,12 +20,31 @@ defmodule Ex6502.Memory do
     GenServer.call(__MODULE__, {:get, location})
   end
 
+  def absolute(location) do
+    location
+    |> resolve_address()
+    |> get()
+  end
+
+  def absolute(location, index) do
+    location
+    |> resolve_address()
+    |> Kernel.+(index)
+    |> get()
+  end
+
   def load(location, values) when is_list(values) do
     GenServer.call(__MODULE__, {:load, location, values})
   end
 
   def dump do
     GenServer.call(__MODULE__, :dump)
+  end
+
+  defp resolve_address(location) do
+    low = get(location)
+    high = get(location + 1)
+    (high <<< 8) + low
   end
 
   # SERVER API

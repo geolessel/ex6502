@@ -40,5 +40,17 @@ defmodule Ex6502.MemoryTest do
       values = [0x01, 0x500, 0x90]
       assert {:error, :value_too_large, 0x500} == Memory.load(0x8000, values)
     end
+
+    test "absolute addressing" do
+      Memory.load(0x8000, [0xBC, 0x07])
+      Memory.set(0x07BC, 0x99)
+      assert Memory.absolute(0x8000) == 0x99
+    end
+
+    test "indexed absolute addressing" do
+      Memory.load(0x8000, [0xBC, 0x07])
+      Memory.set(0x07BE, 0x99)
+      assert Memory.absolute(0x8000, 2) == 0x99
+    end
   end
 end

@@ -3,31 +3,9 @@ defmodule Ex6502.CPU.Executor do
   Handles executing opcodes.
   """
 
-  alias Ex6502.{CPU, Memory}
+  @lda [0xA9, 0xAD, 0xBD, 0xB9, 0xA5, 0xB5, 0xB2, 0xA1, 0xB1]
 
-  use Bitwise
-
-  @doc """
-  LDA Immediate (LDA #$nn)
-
-  ## Operation
-
-  M -> A
-
-  Transfer data from memory to the accumulator.
-
-  ## Flags
-    - Negative: 1 if bit 7 of accumulator is set, 0 otherwise
-    - Zero:     1 if accumulator is zero, 0 otherwise
-  """
-  def execute(0xA9) do
-    pc = CPU.get(:pc)
-    value = Memory.get(pc + 1)
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-
-    # is bit 7 a 1?
-    CPU.set_flag(:n, (value &&& 1 <<< 7) >>> 7)
-    CPU.set_flag(:z, value == 0)
+  def execute(opcode) when opcode in @lda do
+    Ex6502.CPU.Executor.LDA.execute(opcode)
   end
 end
