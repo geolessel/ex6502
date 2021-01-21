@@ -20,15 +20,31 @@ defmodule Ex6502.Memory do
     GenServer.call(__MODULE__, {:get, location})
   end
 
-  def absolute(location) do
+  def absolute(location, index \\ 0) do
     location
     |> resolve_address()
+    |> Kernel.+(index)
     |> get()
   end
 
-  def absolute(location, index) do
+  def indirect(location), do: indirect(location, pre_index: 0)
+
+  def indirect(location, pre_index: index) do
     location
-    |> resolve_address()
+    |> get()
+    |> Kernel.+(index)
+    |> absolute()
+  end
+
+  def indirect(location, post_index: index) do
+    location
+    |> get()
+    |> absolute(index)
+  end
+
+  def zero_page(location, index \\ 0) do
+    location
+    |> get()
     |> Kernel.+(index)
     |> get()
   end

@@ -57,8 +57,7 @@ defmodule Ex6502.CPU.Executor.LDA do
   def execute(0xA5) do
     value =
       (CPU.get(:pc) + 1)
-      |> Memory.get()
-      |> Memory.get()
+      |> Memory.zero_page()
 
     CPU.set(:a, value)
     CPU.advance_pc(2)
@@ -69,9 +68,7 @@ defmodule Ex6502.CPU.Executor.LDA do
   def execute(0xB5) do
     value =
       (CPU.get(:pc) + 1)
-      |> Memory.get()
-      |> Kernel.+(CPU.get(:x))
-      |> Memory.get()
+      |> Memory.zero_page(CPU.get(:x))
 
     CPU.set(:a, value)
     CPU.advance_pc(2)
@@ -82,8 +79,7 @@ defmodule Ex6502.CPU.Executor.LDA do
   def execute(0xB2) do
     value =
       (CPU.get(:pc) + 1)
-      |> Memory.get()
-      |> Memory.absolute()
+      |> Memory.indirect()
 
     CPU.set(:a, value)
     CPU.advance_pc(2)
@@ -94,8 +90,7 @@ defmodule Ex6502.CPU.Executor.LDA do
   def execute(0xA1) do
     value =
       (CPU.get(:pc) + 1)
-      |> Memory.get()
-      |> Memory.absolute(CPU.get(:x))
+      |> Memory.indirect(post_index: CPU.get(:x))
 
     CPU.set(:a, value)
     CPU.advance_pc(2)
@@ -106,9 +101,7 @@ defmodule Ex6502.CPU.Executor.LDA do
   def execute(0xB1) do
     value =
       (CPU.get(:pc) + 1)
-      |> Memory.get()
-      |> Kernel.+(CPU.get(:y))
-      |> Memory.absolute()
+      |> Memory.indirect(pre_index: CPU.get(:y))
 
     CPU.set(:a, value)
     CPU.advance_pc(2)
