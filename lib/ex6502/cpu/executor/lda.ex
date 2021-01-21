@@ -43,6 +43,15 @@ defmodule Ex6502.CPU.Executor.LDA do
     set_flags(value)
   end
 
+  # Y-Indexed absolute
+  def execute(0xB9) do
+    value = Memory.absolute(CPU.get(:pc) + 1, CPU.get(:y))
+
+    CPU.set(:a, value)
+    CPU.advance_pc(3)
+    set_flags(value)
+  end
+
   defp set_flags(value) do
     # is bit 7 a 1?
     CPU.set_flag(:n, (value &&& 1 <<< 7) >>> 7)
