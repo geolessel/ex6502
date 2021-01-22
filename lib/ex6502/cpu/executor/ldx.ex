@@ -20,8 +20,53 @@ defmodule Ex6502.CPU.Executor.LDX do
 
   # LDX Immediate (LDX #$nn)
   def execute(0xA2) do
-    pc = CPU.get(:pc)
-    value = Memory.get(pc + 1)
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.get()
+
+    CPU.set(:x, value)
+    CPU.advance_pc(2)
+    set_flags(value)
+  end
+
+  # LDX Absolute (LDX $nnnn)
+  def execute(0xAE) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.absolute()
+
+    CPU.set(:x, value)
+    CPU.advance_pc(3)
+    set_flags(value)
+  end
+
+  # LDX Y-indexed Absolute (LDX $nnnn,Y)
+  def execute(0xBE) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.absolute(CPU.get(:y))
+
+    CPU.set(:x, value)
+    CPU.advance_pc(3)
+    set_flags(value)
+  end
+
+  # LDX zero-page (LDX $nn)
+  def execute(0xA6) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.zero_page()
+
+    CPU.set(:x, value)
+    CPU.advance_pc(2)
+    set_flags(value)
+  end
+
+  # LDX Y-indexed zero-page (LDX $nn,Y)
+  def execute(0xB6) do
+    value =
+      (CPU.get(:pc) + 1)
+      |> Memory.zero_page(CPU.get(:y))
 
     CPU.set(:x, value)
     CPU.advance_pc(2)
