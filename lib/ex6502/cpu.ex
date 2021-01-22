@@ -26,90 +26,61 @@ defmodule Ex6502.CPU do
   * `$FFFE` - IRQ
   """
 
-  use GenServer
   use Bitwise
 
-  @initial_registers %{a: 0, x: 0, y: 0, sp: 0x01FF, p: 0, pc: 0xFFFC}
+  alias Ex6502.{Computer, CPU}
+
+  @reset_vector 0xFFFC
   @flags %{c: 0, z: 1, i: 2, d: 3, b: 4, v: 6, n: 7}
 
-  # Client API
+  defstruct a: 0, x: 0, y: 0, sp: 0x01FF, p: 0, pc: @reset_vector
 
-  def start(initial_registers \\ %{}) do
-    GenServer.start_link(__MODULE__, initial_registers, name: __MODULE__)
+  def init do
+    %Ex6502.CPU{}
   end
 
-  def get(register) do
-    GenServer.call(__MODULE__, {:get, register})
+  def step_pc(%CPU{} = cpu, amount \\ 1) do
+    Map.update(cpu, :pc, @reset_vector, &(&1 + amount))
   end
 
-  def set(register, value) when value <= 0xFF do
-    GenServer.call(__MODULE__, {:set, register, value})
+  def set(%Computer{cpu: cpu, data_bus: value} = c, register) do
+    Map.put(c, :cpu, Map.put(cpu, register, value))
   end
 
-  def set(:pc, value) when value <= 0xFFFF do
-    GenServer.call(__MODULE__, {:set, :pc, value})
+  def set(%Computer{cpu: cpu} = c, register, value) do
+    Map.put(c, :cpu, Map.put(cpu, register, value))
   end
 
-  def set(_register, _too_large), do: {:error, :too_large}
-
-  def set_flag(flag, value) do
-    GenServer.call(__MODULE__, {:set_flag, flag, value})
+  def execute_instruction(%Computer{} = c) do
+    Ex6502.CPU.Executor.execute(c)
   end
 
-  def flag(flag) do
-    GenServer.call(__MODULE__, {:flag, flag})
+  def flag(%Computer{cpu: cpu}, flag) do
+    (cpu.p &&& 1 <<< @flags[flag]) >>> @flags[flag] == 1
   end
 
-  def advance_pc(amount \\ 1) do
-    GenServer.call(__MODULE__, {:advance_pc, amount})
+  def set_flags(%Computer{cpu: cpu} = c, flags, register) when is_list(flags) do
+    cpu =
+      flags
+      |> Enum.reduce(cpu, fn flag, acc ->
+        pos = @flags[flag]
+
+        if set_flag?(c, flag, register) do
+          Map.put(acc, :p, acc.p ||| 1 <<< pos)
+        else
+          Map.put(acc, :p, acc.p &&& ~~~(1 <<< pos))
+        end
+      end)
+
+    Map.put(c, :cpu, cpu)
   end
 
-  # Server API
-
-  @impl true
-  def init(initial_registers) do
-    {:ok, Map.merge(@initial_registers, initial_registers)}
+  defp set_flag?(%Computer{cpu: cpu}, :z, register) do
+    Map.get(cpu, register) == 0
   end
 
-  @impl true
-  def handle_call({:get, register}, _from, state) do
-    {:reply, Map.get(state, register), state}
-  end
-
-  @impl true
-  def handle_call({:set, register, value}, _from, state) do
-    state = Map.put(state, register, value)
-    {:reply, {:ok, value}, state}
-  end
-
-  @impl true
-  def handle_call({:set_flag, flag, value}, _from, state) do
-    pos = @flags[flag]
-
-    state =
-      if value == false || value == 0 do
-        Map.put(state, :p, state.p &&& ~~~(1 <<< pos))
-      else
-        Map.put(state, :p, state.p ||| 1 <<< pos)
-      end
-
-    {:reply, {:ok, value}, state}
-  end
-
-  @impl true
-  def handle_call({:flag, flag}, _from, state) do
-    status = (state.p &&& 1 <<< @flags[flag]) >>> @flags[flag]
-    {:reply, status == 1, state}
-  end
-
-  @impl true
-  def handle_call({:advance_pc, amount}, _from, state) do
-    state = Map.update(state, :pc, 0, &(&1 + amount))
-
-    if state.pc <= 0xFFFF do
-      {:reply, {:ok, state.pc}, state}
-    else
-      {:reply, {:error, :out_of_bounds}, state}
-    end
+  defp set_flag?(%Computer{cpu: cpu}, :n, register) do
+    # is bit 7 set?
+    (Map.get(cpu, register) &&& 1 <<< 7) >>> 7 == 1
   end
 end

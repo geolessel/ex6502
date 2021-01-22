@@ -1,94 +1,60 @@
 defmodule Ex6502.CPUTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
-  alias Ex6502.CPU
+  alias Ex6502.{Computer, CPU}
 
-  setup do
-    CPU.start()
-    :ok
+  test "step_pc increments pc" do
+    cpu =
+      %CPU{pc: 0}
+      |> CPU.step_pc()
+
+    assert cpu.pc == 1
+
+    cpu = CPU.step_pc(cpu, 2)
+    assert cpu.pc == 3
   end
 
-  describe "registers" do
-    test "getting and setting the state of the a register" do
-      assert {:ok, 0x3F} == CPU.set(:a, 0x3F)
-      assert 0x3F == CPU.get(:a)
-    end
+  test "set/2 sets a register from the data_bus" do
+    c =
+      %Computer{data_bus: 10}
+      |> CPU.set(:a)
 
-    test "getting and setting the state of the x register" do
-      assert {:ok, 0x28} == CPU.set(:x, 0x28)
-      assert 0x28 == CPU.get(:x)
-    end
-
-    test "getting and setting the state of the y register" do
-      assert {:ok, 0xFA} == CPU.set(:y, 0xFA)
-      assert 0xFA == CPU.get(:y)
-    end
-
-    test "trying to set a value that is too large fails" do
-      CPU.set(:a, 0x01)
-      assert {:error, :too_large} == CPU.set(:a, 0x89AC)
-    end
-
-    test "advancing the program counter" do
-      {:ok, _} = CPU.set(:pc, 0x8000)
-      assert {:ok, 0x8001} == CPU.advance_pc()
-      assert {:ok, 0x8004} == CPU.advance_pc(3)
-    end
-
-    test "trying to advance the program counter out of bounds" do
-      {:ok, _} = CPU.set(:pc, 0xFFFF)
-      assert {:error, :out_of_bounds} == CPU.advance_pc()
-    end
+    assert c.cpu.a == 10
   end
 
-  describe "processor status flags" do
-    test "getting and setting the c flag" do
-      {:ok, _} = CPU.set_flag(:c, true)
-      assert true == CPU.flag(:c)
-      {:ok, _} = CPU.set_flag(:c, false)
-      assert false == CPU.flag(:c)
-    end
+  test "set/3 sets a register from arguments" do
+    c =
+      %Computer{}
+      |> CPU.set(:a, 10)
 
-    test "getting and setting the z flag" do
-      {:ok, _} = CPU.set_flag(:z, true)
-      assert true == CPU.flag(:z)
-      {:ok, _} = CPU.set_flag(:z, false)
-      assert false == CPU.flag(:z)
-    end
+    assert c.cpu.a == 10
+  end
 
-    test "getting and setting the i flag" do
-      {:ok, _} = CPU.set_flag(:i, true)
-      assert true == CPU.flag(:i)
-      {:ok, _} = CPU.set_flag(:i, false)
-      assert false == CPU.flag(:i)
-    end
+  test "flag/2 returns a boolean indicating status" do
+    c = %Computer{cpu: %{p: 0b10101010}}
 
-    test "getting and setting the d flag" do
-      {:ok, _} = CPU.set_flag(:d, true)
-      assert true == CPU.flag(:d)
-      {:ok, _} = CPU.set_flag(:d, false)
-      assert false == CPU.flag(:d)
-    end
+    assert CPU.flag(c, :c) == false
+    assert CPU.flag(c, :z) == true
+    assert CPU.flag(c, :i) == false
+    assert CPU.flag(c, :d) == true
+    assert CPU.flag(c, :b) == false
+    assert CPU.flag(c, :v) == false
+    assert CPU.flag(c, :n) == true
+  end
 
-    test "getting and setting the b flag" do
-      {:ok, _} = CPU.set_flag(:b, true)
-      assert true == CPU.flag(:b)
-      {:ok, _} = CPU.set_flag(:b, false)
-      assert false == CPU.flag(:b)
-    end
+  test "set_flags/3 sets flags" do
+    c =
+      %Computer{cpu: %CPU{a: 0x00}}
+      |> CPU.set_flags([:z, :n], :a)
 
-    test "getting and setting the v flag" do
-      {:ok, _} = CPU.set_flag(:v, true)
-      assert true == CPU.flag(:v)
-      {:ok, _} = CPU.set_flag(:v, false)
-      assert false == CPU.flag(:v)
-    end
+    assert CPU.flag(c, :z) == true
+    assert CPU.flag(c, :n) == false
 
-    test "getting and setting the n flag" do
-      {:ok, _} = CPU.set_flag(:n, true)
-      assert true == CPU.flag(:n)
-      {:ok, _} = CPU.set_flag(:n, false)
-      assert false == CPU.flag(:n)
-    end
+    c =
+      %Computer{cpu: %CPU{a: 0x80}}
+      |> CPU.set_flags([:z, :n], :a)
+
+    assert CPU.flag(c, :z) == false
+    assert CPU.flag(c, :n) == true
   end
 end

@@ -1,116 +1,150 @@
 defmodule Ex6502.CPU.Executor.LDYTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias Ex6502.CPU.Executor.LDY
-  alias Ex6502.{CPU, Memory}
+  alias Ex6502.{Computer, CPU, Memory}
 
   setup do
-    Ex6502.CPU.start()
-    Ex6502.Memory.start()
+    m =
+      Memory.init(0xFFFF)
+      |> Memory.set_reset_vector(0x8000)
 
-    CPU.set(:pc, 0x8000)
-    :ok
+    c = Computer.init(memory: m)
+
+    %{c: c}
   end
 
   describe "LDY" do
-    test "$A0 immediate [LDY #$nn]" do
-      Memory.load(0x8000, [0xA0, 0x99])
+    test "$A0 immediate [LDY #$nn]", %{c: c} do
+      c =
+        c
+        |> Computer.load(0x8000, [0xA0, 0x99])
+        |> setup_computer_for(0xA0)
+        |> LDY.execute()
 
-      run_cpu()
-
-      assert 0x99 == CPU.get(:y)
-      assert 0x8002 == CPU.get(:pc)
+      assert c.cpu.y == 0x99
+      assert c.cpu.pc == 0x8002
     end
 
-    test "$AC absolute [LDY #nnnn]" do
-      Memory.load(0x8000, [0xAC, 0x50, 0x85])
-      Memory.set(0x8550, 0x99)
+    test "$AC absolute [LDY #nnnn]", %{c: c} do
+      c =
+        c
+        |> Computer.load(0x8000, [0xAC, 0x50, 0x85])
+        |> setup_computer_for(0xAC)
+        |> Computer.load(0x8550, [0x99])
+        |> LDY.execute()
 
-      run_cpu()
-
-      assert 0x99 == CPU.get(:y)
-      assert 0x8003 == CPU.get(:pc)
+      assert c.cpu.y == 0x99
+      assert c.cpu.pc == 0x8003
     end
 
-    test "$BC x-indexed absolute [LDY $nnnn,X]" do
-      Memory.load(0x8000, [0xBC, 0x50, 0x85])
-      Memory.set(0x8585, 0x99)
-      CPU.set(:x, 0x35)
+    test "$BC x-indexed absolute [LDY $nnnn,X]", %{c: c} do
+      c =
+        c
+        |> Computer.load(0x8000, [0xBC, 0x50, 0x85])
+        |> setup_computer_for(0xBC)
+        |> Computer.load(0x8555, [0x99])
+        |> CPU.set(:x, 0x05)
+        |> LDY.execute()
 
-      run_cpu()
-
-      assert 0x99 == CPU.get(:y)
-      assert 0x8003 == CPU.get(:pc)
+      assert c.cpu.y == 0x99
+      assert c.cpu.pc == 0x8003
     end
 
-    test "$A4 zero page [LDY $nn]" do
-      Memory.load(0x8000, [0xA4, 0x2D])
-      Memory.set(0x2D, 0x99)
+    test "$A4 zero page [LDY $nn]", %{c: c} do
+      c =
+        c
+        |> Computer.load(0x8000, [0xA4, 0x50])
+        |> setup_computer_for(0xA4)
+        |> Computer.load(0x0050, [0x99])
+        |> LDY.execute()
 
-      run_cpu()
-
-      assert 0x99 == CPU.get(:y)
-      assert 0x8002 == CPU.get(:pc)
+      assert c.cpu.y == 0x99
+      assert c.cpu.pc == 0x8002
     end
 
-    test "$B4 x-indexed zero page [LDY $nn,X]" do
-      Memory.load(0x8000, [0xB4, 0x30])
-      Memory.set(0x3F, 0x99)
-      CPU.set(:x, 0x0F)
+    test "$B4 x-indexed zero page [LDY $nn,X]", %{c: c} do
+      c =
+        c
+        |> Computer.load(0x8000, [0xB4, 0x50])
+        |> setup_computer_for(0xB4)
+        |> Computer.load(0x008F, [0x99])
+        |> CPU.set(:x, 0x3F)
+        |> LDY.execute()
 
-      run_cpu()
-
-      assert 0x99 == CPU.get(:y)
-      assert 0x8002 == CPU.get(:pc)
+      assert c.cpu.y == 0x99
+      assert c.cpu.pc == 0x8002
     end
   end
 
   describe "flags" do
-    test "z flag set" do
-      # LDY $8550,X
-      Memory.load(0x8000, [0xBC, 0x50, 0x85])
-      Memory.set(0x8558, 0x00)
-      CPU.set(:x, 0x08)
+    test "z flag set", %{c: c} do
+      assert CPU.flag(c, :z) == false
 
-      run_cpu()
+      c =
+        c
+        |> Computer.load(0x8000, [0xBC, 0x50, 0x85])
+        |> setup_computer_for(0xBC)
+        |> Computer.load(0x8555, [0x00])
+        |> CPU.set(:x, 0x05)
+        |> LDY.execute()
 
-      assert CPU.flag(:z) == true
+      assert CPU.flag(c, :z) == true
     end
 
-    test "z flag clear" do
-      # LDY $8550,X
-      Memory.load(0x8000, [0xBC, 0x50, 0x85])
-      Memory.set(0x8558, 0x90)
-      CPU.set(:x, 0x08)
+    test "z flag clear", %{c: c} do
+      c =
+        c
+        |> CPU.set(:a, 0x00)
+        |> CPU.set_flags([:z], :a)
 
-      CPU.set_flag(:z, true)
-      assert CPU.flag(:z) == true
-      run_cpu()
-      assert CPU.flag(:z) == false
+      assert CPU.flag(c, :z) == true
+
+      c =
+        c
+        |> Computer.load(0x8000, [0xBC, 0x50, 0x85])
+        |> setup_computer_for(0xBC)
+        |> Computer.load(0x8555, [0x99])
+        |> CPU.set(:x, 0x05)
+        |> LDY.execute()
+
+      assert CPU.flag(c, :z) == false
     end
 
-    test "n flag set" do
-      Memory.load(0x8000, [0xA4, 0x50])
-      Memory.set(0x0050, 0x90)
+    test "n flag set", %{c: c} do
+      assert CPU.flag(c, :n) == false
 
-      assert CPU.flag(:n) == false
-      run_cpu()
-      assert CPU.flag(:n) == true
+      c =
+        c
+        |> Computer.load(0x8000, [0xA4, 0x50])
+        |> setup_computer_for(0xA4)
+        |> Computer.load(0x0050, [0x80])
+        |> LDY.execute()
+
+      assert CPU.flag(c, :n) == true
     end
 
-    test "n flag clear" do
-      Memory.load(0x8000, [0xA4, 0x50])
-      Memory.set(0x0050, 0x4F)
+    test "n flag clear", %{c: c} do
+      c =
+        c
+        |> CPU.set(:a, 0xFF)
+        |> CPU.set_flags([:n], :a)
 
-      CPU.set_flag(:n, true)
-      assert CPU.flag(:n) == true
-      run_cpu()
-      assert CPU.flag(:n) == false
+      assert CPU.flag(c, :n) == true
+
+      c =
+        c
+        |> Computer.load(0x8000, [0xA4, 0x03])
+        |> setup_computer_for(0xA4)
+        |> Computer.load(0x0003, [0x7F])
+        |> LDY.execute()
+
+      assert CPU.flag(c, :n) == false
     end
   end
 
-  def run_cpu do
-    CPU.get(:pc)
-    |> Memory.get()
-    |> LDY.execute()
+  def setup_computer_for(c, data) do
+    c
+    |> Map.put(:data_bus, data)
+    |> Map.put(:cpu, Map.update(c.cpu, :pc, 0, &(&1 + 1)))
   end
 end

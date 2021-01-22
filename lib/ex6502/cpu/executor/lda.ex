@@ -14,100 +14,84 @@ defmodule Ex6502.CPU.Executor.LDA do
   - Negative: 1 if bit 7 of accumulator is set; 0 otherwise
   """
 
-  alias Ex6502.{CPU, Memory}
-  import Ex6502.CPU.Executor.LD, only: [set_flags: 1]
+  alias Ex6502.{Computer, CPU, Memory}
 
   use Bitwise
 
-  # LDA Immediate (LDA #$nn)
-  def execute(0xA9) do
-    pc = CPU.get(:pc)
-    value = Memory.get(pc + 1)
+  def execute(%Computer{} = c) do
+    c
+    |> do_execute()
+    |> CPU.set_flags([:n, :z], :a)
+  end
 
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  # LDA Immediate (LDA #$nn)
+  def do_execute(%Computer{data_bus: 0xA9} = c) do
+    c
+    |> Computer.put_next_byte_on_data_bus()
+    |> CPU.set(:a)
   end
 
   # LDA Absolute (LDA $nnnn)
-  def execute(0xAD) do
-    value = Memory.absolute(CPU.get(:pc) + 1)
-
-    CPU.set(:a, value)
-    CPU.advance_pc(3)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xAD} = c) do
+    c
+    |> Computer.put_absolute_address_on_bus()
+    |> Memory.absolute()
+    |> CPU.set(:a)
   end
 
-  # X-indexed absolute
-  def execute(0xBD) do
-    value = Memory.absolute(CPU.get(:pc) + 1, CPU.get(:x))
-
-    CPU.set(:a, value)
-    CPU.advance_pc(3)
-    set_flags(value)
+  # X-indexed absolute (LDA $nnnn,X)
+  def do_execute(%Computer{data_bus: 0xBD} = c) do
+    c
+    |> Computer.put_absolute_address_on_bus()
+    |> Memory.absolute(c.cpu.x)
+    |> CPU.set(:a)
   end
 
-  # Y-Indexed absolute
-  def execute(0xB9) do
-    value = Memory.absolute(CPU.get(:pc) + 1, CPU.get(:y))
-
-    CPU.set(:a, value)
-    CPU.advance_pc(3)
-    set_flags(value)
+  # Y-Indexed absolute (LDA $nnnn,Y)
+  def do_execute(%Computer{data_bus: 0xB9} = c) do
+    c
+    |> Computer.put_absolute_address_on_bus()
+    |> Memory.absolute(c.cpu.y)
+    |> CPU.set(:a)
   end
 
   # zero-page
-  def execute(0xA5) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.zero_page()
-
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xA5} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus()
+    |> Memory.absolute()
+    |> CPU.set(:a)
   end
 
   # x-indexed zero-page
-  def execute(0xB5) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.zero_page(CPU.get(:x))
-
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xB5} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus()
+    |> Memory.absolute(c.cpu.x)
+    |> CPU.set(:a)
   end
 
   # zero-page indirect
-  def execute(0xB2) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.indirect()
-
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xB2} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus()
+    |> Memory.indirect()
+    |> CPU.set(:a)
   end
 
   # x-indexed zero page indirect
-  def execute(0xA1) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.indirect(post_index: CPU.get(:x))
-
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xA1} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus()
+    |> Memory.indirect(c.cpu.x)
+    |> CPU.set(:a)
   end
 
   # zero-page indirect y-indexed
-  def execute(0xB1) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.indirect(pre_index: CPU.get(:y))
-
-    CPU.set(:a, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xB1} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus(c.cpu.y)
+    |> Memory.indirect()
+    |> CPU.set(:a)
   end
 end

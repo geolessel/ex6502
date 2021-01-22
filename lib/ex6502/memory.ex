@@ -1,113 +1,53 @@
 defmodule Ex6502.Memory do
-  use GenServer
+  alias Ex6502.Computer
   use Bitwise
 
   @max_size 0xFFFF
 
-  # CLIENT API
-
-  def start() do
-    GenServer.start_link(__MODULE__, @max_size, name: __MODULE__)
+  def init(size \\ @max_size) do
+    0..(size - 1)
+    |> Enum.map(fn _ -> 0 end)
   end
 
-  def set(location, value) when location <= @max_size and value <= 0xFF do
-    GenServer.call(__MODULE__, {:set, location, value})
-  end
-
-  def set(_location, _value), do: {:error, :value_too_large}
-
-  def get(location) when location <= @max_size do
-    GenServer.call(__MODULE__, {:get, location})
-  end
-
-  def absolute(location, index \\ 0) do
-    location
-    |> resolve_address()
-    |> Kernel.+(index)
-    |> get()
-  end
-
-  def indirect(location), do: indirect(location, pre_index: 0)
-
-  def indirect(location, pre_index: index) do
-    location
-    |> get()
-    |> Kernel.+(index)
-    |> absolute()
-  end
-
-  def indirect(location, post_index: index) do
-    location
-    |> get()
-    |> absolute(index)
-  end
-
-  def zero_page(location, index \\ 0) do
-    location
-    |> get()
-    |> Kernel.+(index)
-    |> get()
-  end
-
-  def load(location, values) when is_list(values) do
-    GenServer.call(__MODULE__, {:load, location, values})
-  end
-
-  def dump do
-    GenServer.call(__MODULE__, :dump)
-  end
-
-  defp resolve_address(location) do
-    low = get(location)
-    high = get(location + 1)
-    (high <<< 8) + low
-  end
-
-  # SERVER API
-
-  @impl true
-  def init(size) do
-    memory =
-      0..(size - 1)
-      |> Enum.map(fn _ -> 0 end)
-
-    {:ok, memory}
-  end
-
-  @impl true
-  def handle_call(:dump, _from, memory) do
-    {:reply, memory, memory}
-  end
-
-  @impl true
-  def handle_call({:set, location, value}, _from, memory) do
-    memory = List.replace_at(memory, location, value)
-    {:reply, {:ok, value}, memory}
-  end
-
-  @impl true
-  def handle_call({:get, location}, _from, memory) do
-    {:reply, Enum.at(memory, location), memory}
-  end
-
-  @impl true
-  def handle_call({:load, location, values}, _from, memory) do
+  def load(memory, location, values) do
     values
     |> ensure_all_are_8_bit()
     |> case do
       true ->
-        memory =
-          values
-          |> Enum.with_index()
-          |> Enum.reduce(memory, fn {value, i}, acc ->
-            List.replace_at(acc, location + i, value)
-          end)
-
-        {:reply, :ok, memory}
+        values
+        |> Enum.with_index()
+        |> Enum.reduce(memory, fn {value, i}, acc ->
+          List.replace_at(acc, location + i, value)
+        end)
 
       {false, val} ->
-        {:reply, {:error, :value_too_large, val}, memory}
+        raise "#{val} doesn't fit into 8 bits"
     end
+  end
+
+  def set_reset_vector(m, address) do
+    high = address >>> 8
+    low = address &&& 0xFF
+    load(m, 0xFFFC, [low, high])
+  end
+
+  def absolute(%Computer{address_bus: location, memory: memory} = c, index \\ 0) do
+    Map.put(c, :data_bus, get(memory, location + index))
+  end
+
+  def indirect(%Computer{} = c, index \\ 0) do
+    address =
+      c.memory
+      |> Enum.slice(c.address_bus, 2)
+      |> Computer.resolve_address()
+
+    c
+    |> Map.put(:address_bus, address + index)
+    |> absolute()
+  end
+
+  def get(memory, location) do
+    Enum.at(memory, location)
   end
 
   defp ensure_all_are_8_bit(values) do

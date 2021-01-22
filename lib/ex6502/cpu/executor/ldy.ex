@@ -14,63 +14,48 @@ defmodule Ex6502.CPU.Executor.LDY do
   - Negative: 1 if bit 7 of register y is set; 0 otherwise
   """
 
-  alias Ex6502.{CPU, Memory}
-  import Ex6502.CPU.Executor.LD, only: [set_flags: 1]
+  alias Ex6502.{Computer, CPU, Memory}
 
   use Bitwise
 
-  # LDY Immediate (LDY #$nn)
-  def execute(0xA0) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.get()
+  def execute(%Computer{} = c) do
+    c
+    |> do_execute()
+    |> CPU.set(:y)
+    |> CPU.set_flags([:n, :z], :y)
+  end
 
-    CPU.set(:y, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  # LDY Immediate (LDY #$nn)
+  def do_execute(%Computer{data_bus: 0xA0} = c) do
+    c
+    |> Computer.put_next_byte_on_data_bus()
   end
 
   # LDY absolute (LDY #nnnn)
-  def execute(0xAC) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.absolute()
-
-    CPU.set(:y, value)
-    CPU.advance_pc(3)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xAC} = c) do
+    c
+    |> Computer.put_absolute_address_on_bus()
+    |> Memory.absolute()
   end
 
   # LDY x-indexed absolute (LDY $nnnn,X)
-  def execute(0xBC) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.absolute(CPU.get(:x))
-
-    CPU.set(:y, value)
-    CPU.advance_pc(3)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xBC} = c) do
+    c
+    |> Computer.put_absolute_address_on_bus()
+    |> Memory.absolute(c.cpu.x)
   end
 
   # LDY zero page (LDY $nn)
-  def execute(0xA4) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.zero_page()
-
-    CPU.set(:y, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xA4} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus()
+    |> Memory.absolute()
   end
 
   # LDY x-indexed zero page (LDY $nn,X)
-  def execute(0xB4) do
-    value =
-      (CPU.get(:pc) + 1)
-      |> Memory.zero_page(CPU.get(:x))
-
-    CPU.set(:y, value)
-    CPU.advance_pc(2)
-    set_flags(value)
+  def do_execute(%Computer{data_bus: 0xB4} = c) do
+    c
+    |> Computer.put_zero_page_on_address_bus()
+    |> Memory.absolute(c.cpu.x)
   end
 end
