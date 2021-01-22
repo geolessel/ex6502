@@ -15,6 +15,7 @@ defmodule Ex6502.CPU.Executor.LDA do
   """
 
   alias Ex6502.{CPU, Memory}
+  import Ex6502.CPU.Executor.LD, only: [set_flags: 1]
 
   use Bitwise
 
@@ -108,11 +109,5 @@ defmodule Ex6502.CPU.Executor.LDA do
     CPU.set(:a, value)
     CPU.advance_pc(2)
     set_flags(value)
-  end
-
-  defp set_flags(value) do
-    # is bit 7 a 1?
-    CPU.set_flag(:n, (value &&& 1 <<< 7) >>> 7)
-    CPU.set_flag(:z, value == 0)
   end
 end
