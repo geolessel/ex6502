@@ -38,8 +38,7 @@ defmodule Ex6502.Memory do
   def indirect(%Computer{} = c, index \\ 0) do
     address =
       c.memory
-      |> Enum.slice(c.address_bus, 2)
-      |> Computer.resolve_address()
+      |> Computer.resolve_address(c.address_bus)
 
     c
     |> Map.put(:address_bus, address + index)

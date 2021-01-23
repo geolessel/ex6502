@@ -75,6 +75,18 @@ defmodule Ex6502.CPU do
     Map.put(c, :cpu, cpu)
   end
 
+  def set_flag(%Computer{cpu: cpu} = c, flag, value) do
+    Map.put(c, :cpu, Map.put(cpu, :p, set_bit(cpu.p, @flags[flag], value)))
+  end
+
+  def set_bit(p, pos, value) do
+    if value == 0 || value == false do
+      p &&& ~~~(1 <<< pos)
+    else
+      p ||| 1 <<< pos
+    end
+  end
+
   defp set_flag?(%Computer{cpu: cpu}, :z, register) do
     Map.get(cpu, register) == 0
   end
