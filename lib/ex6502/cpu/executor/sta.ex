@@ -1,5 +1,5 @@
 defmodule Ex6502.CPU.Executor.STA do
-  alias Ex6502.{Computer, CPU, Memory}
+  alias Ex6502.{Computer, Memory}
 
   # Absolute (STA $nnnn)
   def execute(%Computer{data_bus: 0x8D} = c) do
