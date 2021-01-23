@@ -13,8 +13,6 @@ defmodule Ex6502.CPU.Executor.STZ do
 
   alias Ex6502.{Computer, Memory}
 
-  use Bitwise
-
   # Absolute (STZ $nnnn)
   def execute(%Computer{data_bus: 0x9C} = c) do
     with c <- Computer.put_absolute_address_on_bus(c) do
