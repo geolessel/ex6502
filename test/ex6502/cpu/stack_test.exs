@@ -25,4 +25,21 @@ defmodule Ex6502.CPU.StackTest do
     c = Stack.push(c, 0x99)
     assert c.cpu.sp == 0xFE
   end
+
+  test "pop_to/2 pops the top of the stack into a register", %{c: c} do
+    c =
+      %{c | cpu: %{c.cpu | sp: 0xFE}}
+      |> Computer.load(0x01FF, [0x99])
+      |> Stack.pop_to(:a)
+
+    assert c.cpu.a == 0x99
+  end
+
+  test "pop_to/2 increments the stack pointer", %{c: c} do
+    c =
+      %{c | cpu: %{c.cpu | sp: 0xFE}}
+      |> Stack.pop_to(:a)
+
+    assert c.cpu.sp == 0xFF
+  end
 end
