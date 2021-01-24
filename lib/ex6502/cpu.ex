@@ -33,7 +33,7 @@ defmodule Ex6502.CPU do
   @reset_vector 0xFFFC
   @flags %{c: 0, z: 1, i: 2, d: 3, b: 4, v: 6, n: 7}
 
-  defstruct a: 0, x: 0, y: 0, sp: 0x01FF, p: 0, pc: @reset_vector
+  defstruct a: 0, x: 0, y: 0, sp: 0xFF, p: 0, pc: @reset_vector
 
   def init do
     %Ex6502.CPU{}

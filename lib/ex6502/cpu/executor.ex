@@ -19,6 +19,7 @@ defmodule Ex6502.CPU.Executor do
   @txa [0x8A]
   @tya [0x98]
   @txs [0x9A]
+  @pha [0x48]
   @brk [0x00]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
@@ -59,6 +60,9 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @txs,
     do: Executor.TXS.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @pha,
+    do: Executor.PHA.execute(c)
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
