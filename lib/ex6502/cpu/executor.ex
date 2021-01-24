@@ -21,6 +21,7 @@ defmodule Ex6502.CPU.Executor do
   @txs [0x9A]
   @pha [0x48]
   @php [0x08]
+  @phx [0xDA]
   @brk [0x00]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
@@ -67,6 +68,9 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @php,
     do: Executor.PHP.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @phx,
+    do: Executor.PHX.execute(c)
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
