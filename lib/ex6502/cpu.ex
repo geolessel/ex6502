@@ -59,7 +59,8 @@ defmodule Ex6502.CPU do
     (cpu.p &&& 1 <<< @flags[flag]) >>> @flags[flag] == 1
   end
 
-  def set_flags(%Computer{cpu: cpu} = c, flags, register) when is_list(flags) do
+  def set_flags(%Computer{cpu: cpu} = c, flags, register)
+      when is_list(flags) do
     cpu =
       flags
       |> Enum.reduce(cpu, fn flag, acc ->
@@ -87,12 +88,22 @@ defmodule Ex6502.CPU do
     end
   end
 
-  defp set_flag?(%Computer{cpu: cpu}, :z, register) do
-    Map.get(cpu, register) == 0
+  defp set_flag?(%Computer{cpu: cpu} = c, :z, register) when is_atom(register),
+    do: set_flag?(c, :z, Map.get(cpu, register))
+
+  defp set_flag?(%Computer{}, :z, value) when is_integer(value), do: value == 0
+
+  defp set_flag?(%Computer{cpu: cpu} = c, :n, register) when is_atom(register) do
+    set_flag?(c, :n, Map.get(cpu, register))
   end
 
-  defp set_flag?(%Computer{cpu: cpu}, :n, register) do
-    # is bit 7 set?
-    (Map.get(cpu, register) &&& 1 <<< 7) >>> 7 == 1
-  end
+  # is bit 7 set?
+  defp set_flag?(%Computer{}, :n, value) when is_integer(value),
+    do: (value &&& 1 <<< 7) >>> 7 == 1
+
+  defp set_flag?(%Computer{}, :c, value) when value in [1, true],
+    do: true
+
+  defp set_flag?(%Computer{}, :c, value),
+    do: false
 end

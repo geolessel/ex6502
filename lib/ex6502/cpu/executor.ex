@@ -27,6 +27,7 @@ defmodule Ex6502.CPU.Executor do
   @plp [0x28]
   @plx [0xFA]
   @ply [0x7A]
+  @asl [0x0A, 0x0E, 0x1E, 0x06, 0x16]
   @brk [0x00]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
@@ -91,6 +92,9 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @ply,
     do: Executor.PLY.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @asl,
+    do: Executor.ASL.execute(c)
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
