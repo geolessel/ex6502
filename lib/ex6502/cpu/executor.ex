@@ -30,6 +30,7 @@ defmodule Ex6502.CPU.Executor do
   @asl [0x0A, 0x0E, 0x1E, 0x06, 0x16]
   @lsr [0x4A, 0x4E, 0x5E, 0x46, 0x56]
   @rol [0x2A, 0x2E, 0x3E, 0x26, 0x36]
+  @ror [0x6A, 0x6E, 0x7E, 0x66, 0x76]
   @brk [0x00]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
@@ -103,6 +104,9 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @rol,
     do: Executor.ROL.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @ror,
+    do: Executor.ROR.execute(c)
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
