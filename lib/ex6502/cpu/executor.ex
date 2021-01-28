@@ -35,6 +35,7 @@ defmodule Ex6502.CPU.Executor do
   @bit [0x89, 0x2C, 0x3C, 0x24, 0x34]
   @eor [0x49, 0x4D, 0x5D, 0x59, 0x45, 0x55, 0x52, 0x41, 0x51]
   @ora [0x09, 0x0D, 0x1D, 0x19, 0x05, 0x15, 0x12, 0x01, 0x11]
+  @trb [0x1C, 0x14]
   @brk [0x00]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
@@ -123,6 +124,9 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @ora,
     do: Executor.ORA.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @trb,
+    do: Executor.TRB.execute(c)
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
