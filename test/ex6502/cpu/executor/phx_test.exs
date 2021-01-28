@@ -1,5 +1,6 @@
 defmodule Ex6502.CPU.Executor.PHXTest do
   use ExUnit.Case, async: true
+  import Ex6502.TestHelper
 
   alias Ex6502.{Computer, CPU, Memory}
   alias Ex6502.CPU.Executor.PHX
@@ -27,11 +28,5 @@ defmodule Ex6502.CPU.Executor.PHXTest do
       assert c.cpu.pc == 0x8001
       assert Memory.get(c.memory, 0x01FF) == 0x99
     end
-  end
-
-  def setup_computer_for(c, data) do
-    c
-    |> Map.put(:data_bus, data)
-    |> Map.put(:cpu, Map.update(c.cpu, :pc, 0, &(&1 + 1)))
   end
 end

@@ -1,5 +1,6 @@
 defmodule Ex6502.CPU.Executor.TSXTest do
   use ExUnit.Case, async: true
+  import Ex6502.TestHelper
   alias Ex6502.CPU.Executor.TSX
   alias Ex6502.{Computer, CPU}
 

@@ -1,5 +1,6 @@
 defmodule Ex6502.CPU.Executor.ASLTest do
   use ExUnit.Case, async: true
+  import Ex6502.TestHelper
 
   alias Ex6502.CPU.Executor.ASL
   alias Ex6502.{Computer, CPU, Memory}
@@ -147,11 +148,5 @@ defmodule Ex6502.CPU.Executor.ASLTest do
 
       assert CPU.flag(c, :c) == false
     end
-  end
-
-  def setup_computer_for(c, data) do
-    c
-    |> Map.put(:data_bus, data)
-    |> Map.put(:cpu, Map.update(c.cpu, :pc, 0, &(&1 + 1)))
   end
 end

@@ -1,5 +1,7 @@
 defmodule Ex6502.CPU.Executor.STZTest do
   use ExUnit.Case, async: true
+  import Ex6502.TestHelper
+
   alias Ex6502.CPU.Executor.STZ
   alias Ex6502.{Computer, CPU, Memory}
 
@@ -63,11 +65,5 @@ defmodule Ex6502.CPU.Executor.STZTest do
       assert Memory.get(c.memory, 0x0059) == 0
       assert c.cpu.pc == 0x8002
     end
-  end
-
-  def setup_computer_for(c, data) do
-    c
-    |> Map.put(:data_bus, data)
-    |> Map.put(:cpu, Map.update(c.cpu, :pc, 0, &(&1 + 1)))
   end
 end

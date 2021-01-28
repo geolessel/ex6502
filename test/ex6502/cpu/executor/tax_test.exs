@@ -1,5 +1,7 @@
 defmodule Ex6502.CPU.Executor.TAXTest do
   use ExUnit.Case, async: true
+  import Ex6502.TestHelper
+
   alias Ex6502.CPU.Executor.TAX
   alias Ex6502.{Computer, CPU}
 
