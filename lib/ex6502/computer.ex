@@ -66,9 +66,9 @@ defmodule Ex6502.Computer do
     |> step_pc()
   end
 
-  def put_absolute_address_on_bus(%Computer{cpu: cpu, memory: memory} = c) do
+  def put_absolute_address_on_bus(%Computer{cpu: cpu, memory: memory} = c, offset \\ 0) do
     c
-    |> Map.put(:address_bus, resolve_address(memory, cpu.pc))
+    |> Map.put(:address_bus, resolve_address(memory, cpu.pc) + offset)
     |> step_pc(2)
   end
 
