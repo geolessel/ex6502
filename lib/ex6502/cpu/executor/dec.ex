@@ -35,7 +35,7 @@ defmodule Ex6502.CPU.Executor.DEC do
   # This is a special mode that needs its own special function
   #
   # addressing       assembler    opc  bytes  cycles
-  # accumulator      DEC           3A    1     2
+  # accumulator      DEC           3A    1      1
   def execute(%Computer{data_bus: 0x3A} = c) do
     # subtraction is really addition with the complement
     <<result::unsigned>> = <<c.cpu.a + (~~~0x01 + 1)>>
@@ -63,20 +63,20 @@ defmodule Ex6502.CPU.Executor.DEC do
   end
 
   # addressing       assembler    opc  bytes  cycles
-  # absolute         DEC $nnnn     CE    3     4 d
+  # absolute         DEC $nnnn     CE    3      6
   def do_execute(%Computer{data_bus: 0xCE} = c), do: Computer.put_absolute_address_on_bus(c)
 
   # addressing       assembler    opc  bytes  cycles
-  # absolute,X       DEC $nnnn,X   DE    3     4 dp
+  # absolute,X       DEC $nnnn,X   DE    3      7
   def do_execute(%Computer{data_bus: 0xDE} = c),
     do: Computer.put_absolute_address_on_bus(c, c.cpu.x)
 
   # addressing       assembler    opc  bytes  cycles
-  # zeropage         DEC $nn       C6    2     3 d
+  # zeropage         DEC $nn       C6    2      5
   def do_execute(%Computer{data_bus: 0xC6} = c), do: Computer.put_zero_page_on_address_bus(c)
 
   # addressing       assembler    opc  bytes  cycles
-  # zeropage,X       DEC $nn,X     D6    2     4 d
+  # zeropage,X       DEC $nn,X     D6    2      6
   def do_execute(%Computer{data_bus: 0xD6} = c),
     do: Computer.put_zero_page_on_address_bus(c, c.cpu.x)
 end

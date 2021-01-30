@@ -43,6 +43,7 @@ defmodule Ex6502.CPU.Executor do
   @cpy [0xC0, 0xCC, 0xC4]
   @sbc [0xE9, 0xED, 0xFD, 0xF9, 0xE5, 0xF5, 0xF2, 0xE1, 0xF1]
   @dec [0x3A, 0xCE, 0xDE, 0xC6, 0xD6]
+  @dex [0xCA]
   @brk [0x00]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
@@ -155,6 +156,9 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @dec,
     do: Executor.DEC.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @dex,
+    do: Executor.DEX.execute(c)
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
