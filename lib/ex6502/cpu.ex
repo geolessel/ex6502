@@ -59,14 +59,14 @@ defmodule Ex6502.CPU do
     (cpu.p &&& 1 <<< @flags[flag]) >>> @flags[flag] == 1
   end
 
-  def set_flags(%Computer{cpu: cpu} = c, flags, register)
+  def set_flags(%Computer{cpu: cpu} = c, flags, register_or_value)
       when is_list(flags) do
     cpu =
       flags
       |> Enum.reduce(cpu, fn flag, acc ->
         pos = @flags[flag]
 
-        if set_flag?(c, flag, register) do
+        if set_flag?(c, flag, register_or_value) do
           Map.put(acc, :p, acc.p ||| 1 <<< pos)
         else
           Map.put(acc, :p, acc.p &&& ~~~(1 <<< pos))
