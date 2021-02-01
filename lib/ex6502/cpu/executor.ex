@@ -58,6 +58,7 @@ defmodule Ex6502.CPU.Executor do
   @bcs [0xB0]
   @beq [0xF0]
   @bmi [0x30]
+  @bne [0xD0]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
     do: Executor.LDA.execute(c)
@@ -214,4 +215,7 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @bmi,
     do: Executor.BMI.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @bne,
+    do: Executor.BNE.execute(c)
 end
