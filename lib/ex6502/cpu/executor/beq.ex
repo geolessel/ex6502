@@ -24,17 +24,9 @@ defmodule Ex6502.CPU.Executor.BEQ do
   """
 
   alias Ex6502.{Computer, CPU}
+  import CPU.Executor.Branching
 
   # addressing       assembler    opc  bytes  cycles
   # relative         BEQ $nnnn    F0     2     2 tp
-  def execute(%Computer{data_bus: 0xF0} = c) do
-    with %Computer{address_bus: address} = c <- Computer.put_absolute_address_on_bus(c) do
-      if CPU.flag(c, :z) do
-        <<_unused::integer-8, offset::signed-integer-8>> = <<address::integer-16>>
-        CPU.set(c, :pc, c.cpu.pc + offset)
-      else
-        c
-      end
-    end
-  end
+  def execute(%Computer{data_bus: 0xF0} = c), do: branch(c, CPU.flag(c, :z))
 end

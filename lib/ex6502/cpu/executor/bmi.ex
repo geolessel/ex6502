@@ -22,17 +22,9 @@ defmodule Ex6502.CPU.Executor.BMI do
   """
 
   alias Ex6502.{Computer, CPU}
+  import CPU.Executor.Branching
 
   # addressing       assembler    opc  bytes  cycles
   # relative         BMI $nnnn    30     2     2 tp
-  def execute(%Computer{data_bus: 0x30} = c) do
-    with %Computer{address_bus: address} = c <- Computer.put_absolute_address_on_bus(c) do
-      if CPU.flag(c, :n) do
-        <<_unused::integer-8, offset::signed-integer-8>> = <<address::integer-16>>
-        CPU.set(c, :pc, c.cpu.pc + offset)
-      else
-        c
-      end
-    end
-  end
+  def execute(%Computer{data_bus: 0x30} = c), do: branch(c, CPU.flag(c, :n))
 end

@@ -42,6 +42,8 @@ defmodule Ex6502.CPU.Executor.ADC do
   use Bitwise
 
   def execute(%Computer{} = c) do
+    if CPU.flag(c, :d), do: raise(RuntimeError, "Decimal mode is not yet supported")
+
     c
     |> do_execute()
     |> set_flags()
