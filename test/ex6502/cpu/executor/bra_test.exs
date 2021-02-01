@@ -3,7 +3,7 @@ defmodule Ex6502.CPU.Executor.BRATest do
   import Ex6502.TestHelper
 
   alias Ex6502.CPU.Executor.BRA
-  alias Ex6502.{Computer, CPU, Memory}
+  alias Ex6502.{Computer, Memory}
 
   setup do
     m =
