@@ -16,6 +16,5 @@ defmodule Ex6502.CPU.Executor.TXS do
   def execute(%Computer{data_bus: 0x9A} = c) do
     c
     |> Map.put(:cpu, %{c.cpu | sp: c.cpu.x})
-    |> Computer.step_pc()
   end
 end

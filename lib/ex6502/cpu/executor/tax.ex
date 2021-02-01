@@ -18,6 +18,5 @@ defmodule Ex6502.CPU.Executor.TAX do
     c
     |> Map.put(:cpu, %{c.cpu | x: c.cpu.a})
     |> CPU.set_flags([:n, :z], :x)
-    |> Computer.step_pc()
   end
 end

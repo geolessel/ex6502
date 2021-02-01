@@ -18,6 +18,5 @@ defmodule Ex6502.CPU.Executor.TYA do
     c
     |> Map.put(:cpu, %{c.cpu | a: c.cpu.y})
     |> CPU.set_flags([:n, :z], :a)
-    |> Computer.step_pc()
   end
 end
