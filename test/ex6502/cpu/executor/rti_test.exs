@@ -4,7 +4,6 @@ defmodule Ex6502.CPU.Executor.RTITest do
 
   alias Ex6502.CPU.Executor.RTI
   alias Ex6502.{Computer, CPU, Memory}
-  alias Ex6502.CPU.Stack
 
   setup do
     m =
