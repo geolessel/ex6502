@@ -50,6 +50,7 @@ defmodule Ex6502.CPU.Executor do
   @iny [0xC8]
   @bra [0x80]
   @brk [0x00]
+  @jmp [0x4C, 0x6C, 0x7C]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
     do: Executor.LDA.execute(c)
@@ -182,4 +183,7 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @brk,
     do: Executor.BRK.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @jmp,
+    do: Executor.JMP.execute(c)
 end
