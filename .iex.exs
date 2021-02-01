@@ -6,7 +6,7 @@ IEx.configure(
   inspect: [
     base: :hex,
     charlists: :as_lists,
-    limit: :infinity,
+    limit: 8,
     pretty: true
   ]
 )
