@@ -9,6 +9,13 @@ defmodule Ex6502.CPU.Stack do
     |> Map.put(:cpu, %{c.cpu | sp: c.cpu.sp - 1})
   end
 
+  def pop(%Computer{} = c) do
+    with c <- Map.put(c, :cpu, %{c.cpu | sp: c.cpu.sp + 1}) do
+      value = Memory.get(c.memory, resolve_address(c.cpu.sp))
+      {value, c}
+    end
+  end
+
   def pop_to(%Computer{} = c, register) do
     with c <- Map.put(c, :cpu, %{c.cpu | sp: c.cpu.sp + 1}) do
       value = Memory.get(c.memory, resolve_address(c.cpu.sp))
