@@ -33,6 +33,19 @@ defmodule Ex6502.Computer do
     |> Map.update(:cpu, :no_cpu, fn cpu -> Map.put(cpu, :pc, address) end)
   end
 
+  def load_file(%Computer{} = c, path) do
+    data =
+      path
+      |> File.read!()
+      |> parse()
+
+    load(c, data)
+  end
+
+  def load(%Computer{} = c, values) when is_list(values) do
+    Map.put(c, :memory, values)
+  end
+
   def load(%Computer{memory: memory} = c, location, values) do
     Map.put(c, :memory, Memory.load(memory, location, values))
   end
@@ -88,6 +101,10 @@ defmodule Ex6502.Computer do
   def step_pc(%Computer{cpu: cpu} = c, amount \\ 1) do
     Map.put(c, :cpu, CPU.step_pc(cpu, amount))
   end
+
+  def parse(data) when is_binary(data), do: parse(data, [])
+  def parse(<<>>, data), do: data
+  def parse(<<byte::integer-8, rest::binary>>, data), do: [byte | parse(rest, data)]
 
   defp put_pc_on_address_bus(%Computer{cpu: %{pc: pc}} = c) do
     Map.put(c, :address_bus, pc)
