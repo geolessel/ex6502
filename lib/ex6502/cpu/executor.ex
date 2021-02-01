@@ -66,6 +66,7 @@ defmodule Ex6502.CPU.Executor do
   @cld [0xD8]
   @cli [0x58]
   @clv [0xB8]
+  @sec [0x38]
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @lda,
     do: Executor.LDA.execute(c)
@@ -246,4 +247,7 @@ defmodule Ex6502.CPU.Executor do
 
   def execute(%Computer{data_bus: opcode} = c) when opcode in @clv,
     do: Executor.CLV.execute(c)
+
+  def execute(%Computer{data_bus: opcode} = c) when opcode in @sec,
+    do: Executor.SEC.execute(c)
 end
