@@ -49,6 +49,26 @@ defmodule Ex6502.Memory do
     Enum.at(memory, location)
   end
 
+  def inspect(%Computer{memory: memory}, start_location, length) do
+    0..(length - 1)
+    |> Enum.chunk_every(16)
+    |> Enum.map(fn [first | _] = line ->
+      bytes =
+        line
+        |> Enum.map(fn offset ->
+          :io_lib.format("~2.16.0B", [get(memory, start_location + offset)])
+        end)
+        |> Enum.join(" ")
+
+      line =
+        :io_lib.format("~4.16.0B | ", [start_location + first])
+        |> IO.chardata_to_string()
+
+      line <> bytes
+    end)
+    |> Enum.join("\n")
+  end
+
   defp ensure_all_are_8_bit(values) do
     values
     |> Enum.find(fn value -> value > 0xFF end)
