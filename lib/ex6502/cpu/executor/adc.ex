@@ -50,7 +50,9 @@ defmodule Ex6502.CPU.Executor.ADC do
   end
 
   def set_flags({%Computer{} = c, value}) do
-    result = value + c.cpu.a
+    carry_value = if CPU.flag(c, :c), do: 1, else: 0
+
+    result = value + c.cpu.a + carry_value
     masked = result &&& 0xFF
 
     c
