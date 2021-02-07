@@ -49,6 +49,10 @@ defmodule Ex6502.Memory do
     Enum.at(memory, location)
   end
 
+  def get(memory, location, amount) do
+    Enum.slice(memory, location, amount)
+  end
+
   def inspect(%Computer{memory: memory}, start_location, length) do
     0..(length - 1)
     |> Stream.chunk_every(16)
