@@ -51,8 +51,8 @@ defmodule Ex6502.Memory do
 
   def inspect(%Computer{memory: memory}, start_location, length) do
     0..(length - 1)
-    |> Enum.chunk_every(16)
-    |> Enum.map(fn [first | _] = line ->
+    |> Stream.chunk_every(16)
+    |> Stream.map(fn [first | _] = line ->
       bytes =
         line
         |> Enum.map(fn offset ->
@@ -64,9 +64,30 @@ defmodule Ex6502.Memory do
         :io_lib.format("~4.16.0B | ", [start_location + first])
         |> IO.chardata_to_string()
 
-      line <> bytes
+      line <> bytes <> "\n"
     end)
-    |> Enum.join("\n")
+    |> Enum.to_list()
+  end
+
+  def dump(%Computer{memory: memory}, length \\ 0xFFFF) do
+    memory
+    |> Stream.chunk_every(16)
+    |> Stream.with_index()
+    |> Stream.map(fn {[first | _] = line, index} ->
+      bytes =
+        line
+        |> Enum.map(fn offset ->
+          :io_lib.format("~2.16.0B", [offset])
+        end)
+        |> Enum.join(" ")
+
+      line =
+        :io_lib.format("~4.16.0B | ", [index * 16])
+        |> IO.chardata_to_string()
+
+      line <> bytes <> "\n"
+    end)
+    |> Stream.take(length)
   end
 
   defp ensure_all_are_8_bit(values) do
