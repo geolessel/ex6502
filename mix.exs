@@ -42,7 +42,7 @@ defmodule Ex6502.MixProject do
   defp package do
     [
       name: :ex6502,
-      files: ["lib", "mix.exs", "README*"],
+      files: ["lib", "mix.exs", "README*", "CHANGELOG*"],
       maintainers: ["Geoffrey Lessel"],
       licenses: ["MIT"],
       links: %{"GitHub" => @source_url}
@@ -54,7 +54,7 @@ defmodule Ex6502.MixProject do
       name: "Ex6502",
       source_url: @source_url,
       main: "readme",
-      extras: ["README.md"]
+      extras: ["README.md", "CHANGELOG.md"]
     ]
   end
 end
