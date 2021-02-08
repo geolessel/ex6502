@@ -30,7 +30,15 @@ defmodule Ex6502.Computer do
     c
     # reset vector
     |> Map.put(:address_bus, address)
-    |> Map.update(:cpu, :no_cpu, fn cpu -> Map.put(cpu, :pc, address) end)
+    |> Map.update(:cpu, :no_cpu, fn cpu ->
+      cpu
+      |> Map.put(:pc, address)
+      |> Map.put(:a, 0)
+      |> Map.put(:x, 0)
+      |> Map.put(:y, 0)
+      |> Map.put(:p, 0)
+      |> Map.put(:sp, 0xFF)
+    end)
   end
 
   def load_file(%Computer{} = c, path) do
