@@ -42,12 +42,14 @@ defmodule Ex6502.CPU.Executor.BRK do
     # flow from https://www.pagetable.com/?p=410
 
     <<high::integer-8, low::integer-8>> = <<c.cpu.pc::integer-16>>
+    p = c.cpu.p ||| 0x10
 
     c
+    |> CPU.set(:p, p)
     |> CPU.Stack.push(high)
     |> CPU.Stack.push(low)
     # set B flag
-    |> CPU.Stack.push(c.cpu.p ||| 0x10)
+    |> CPU.Stack.push(p)
     |> CPU.set(:pc, 0xFFFE)
     |> Map.put(:running, false)
   end
