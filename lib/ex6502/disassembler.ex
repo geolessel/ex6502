@@ -4,9 +4,13 @@ defmodule Ex6502.Disassembler do
   use Bitwise
 
   def disassemble(%Computer{cpu: %{pc: pc}, memory: memory}) do
-    [opcode, low_byte, high_byte] = Memory.get(memory, pc, 3)
+    case Memory.get(memory, pc, 3) do
+      [opcode, low_byte, high_byte] ->
+        disassemble({opcode, low_byte, high_byte})
 
-    disassemble({opcode, low_byte, high_byte})
+      [] ->
+        "???"
+    end
   end
 
   ### LDA #####################################################################
@@ -380,7 +384,7 @@ defmodule Ex6502.Disassembler do
   # - NOP end -----------------------------------------------------------------
 
   def disassemble(c) do
-    IO.inspect(c, base: :hex, label: "unknown disassembler")
+    IO.inspect(c, base: :hex, label: "unknown code")
     "???"
   end
 
