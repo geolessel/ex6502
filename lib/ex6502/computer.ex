@@ -2,7 +2,8 @@ defmodule Ex6502.Computer do
   alias Ex6502.{Computer, CPU, Memory}
   use Bitwise
 
-  defstruct cpu: %Ex6502.CPU{},
+  defstruct break: false,
+            cpu: %Ex6502.CPU{},
             cycles: 0,
             memory: [],
             address_bus: 0xFFFF,
@@ -60,6 +61,7 @@ defmodule Ex6502.Computer do
 
   def step(%Computer{} = c) do
     c
+    |> Map.put(:break, false)
     |> put_pc_on_address_bus()
     |> handle_interrupt_location()
     |> update_data_bus_from_address_bus()
@@ -80,6 +82,10 @@ defmodule Ex6502.Computer do
   end
 
   defp maybe_run(%Computer{running: false} = c), do: c
+
+  defp maybe_run(%Computer{break: true} = c),
+    do: c |> Map.put(:break, false) |> Map.put(:running, false)
+
   defp maybe_run(%Computer{} = c), do: run(c)
 
   def put_next_byte_on_data_bus(%Computer{cpu: cpu, memory: memory} = c) do
@@ -107,6 +113,8 @@ defmodule Ex6502.Computer do
 
   def resolve_address([low, high]), do: (high <<< 8) + low
 
+  def step_pc(%Computer{break: true} = c, _), do: c
+
   def step_pc(%Computer{cpu: cpu} = c, amount \\ 1) do
     Map.put(c, :cpu, CPU.step_pc(cpu, amount))
   end
@@ -118,6 +126,8 @@ defmodule Ex6502.Computer do
   defp put_pc_on_address_bus(%Computer{cpu: %{pc: pc}} = c) do
     Map.put(c, :address_bus, pc)
   end
+
+  defp update_data_bus_from_address_bus(%Computer{break: true} = c), do: c
 
   defp update_data_bus_from_address_bus(%Computer{address_bus: address, memory: memory} = c) do
     c
