@@ -25,6 +25,12 @@ defmodule Ex6502.Memory do
     end
   end
 
+  def set(memory, location, value) do
+    with true <- ensure_all_are_8_bit([value]) do
+      List.replace_at(memory, location, value)
+    end
+  end
+
   def set_reset_vector(m, address) do
     high = address >>> 8
     low = address &&& 0xFF
