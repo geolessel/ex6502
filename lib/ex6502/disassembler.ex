@@ -8,7 +8,7 @@ defmodule Ex6502.Disassembler do
       [opcode, low_byte, high_byte] ->
         disassemble({opcode, low_byte, high_byte})
 
-      [] ->
+      idontknow ->
         "???"
     end
   end

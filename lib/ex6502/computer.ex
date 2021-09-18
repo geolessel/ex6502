@@ -61,6 +61,7 @@ defmodule Ex6502.Computer do
   def step(%Computer{} = c) do
     c
     |> put_pc_on_address_bus()
+    |> handle_interrupt_location()
     |> update_data_bus_from_address_bus()
     |> step_pc()
     |> CPU.execute_instruction()
@@ -122,4 +123,14 @@ defmodule Ex6502.Computer do
     c
     |> Map.put(:data_bus, Enum.at(memory, address))
   end
+
+  defp handle_interrupt_location(%Computer{cpu: %{pc: pc}} = c) when pc in [0xFFFC, 0xFFFE] do
+    new_pc = resolve_address(c.memory, pc)
+
+    c
+    |> Map.put(:break, true)
+    |> Map.put(:cpu, %{c.cpu | pc: new_pc})
+  end
+
+  defp handle_interrupt_location(%Computer{} = c), do: c
 end

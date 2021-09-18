@@ -51,6 +51,8 @@ defmodule Ex6502.CPU do
     Map.put(c, :cpu, Map.put(cpu, register, value))
   end
 
+  def execute_instruction(%Computer{break: true} = c), do: c
+
   def execute_instruction(%Computer{} = c) do
     Ex6502.CPU.Executor.execute(c)
   end

@@ -172,6 +172,7 @@ what you've created.
 * [ ] handle continuation from `BRK` interrupts
 * [ ] emulate hardware interrupts
 * [ ] basic assembler?
+* [ ] better tests using named [named setups](https://mreigen.medium.com/elixir-a-cleaner-way-to-organize-tests-using-exunits-named-setup-8abb43971ca4)?
 
 ## Me
 

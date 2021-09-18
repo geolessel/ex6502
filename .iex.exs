@@ -1,4 +1,4 @@
-alias Ex6502.{Computer, CPU, Executor, Memory}
+alias Ex6502.{Computer, ComputerServer, CPU, Executor, Memory}
 
 use Bitwise
 
