@@ -8,7 +8,8 @@ defmodule Ex6502.Computer do
             memory: [],
             address_bus: 0xFFFF,
             data_bus: 0xFF,
-            running: false
+            running: false,
+            io_subscribers: MapSet.new()
 
   @reset_vector 0xFFFC
 
@@ -56,7 +57,16 @@ defmodule Ex6502.Computer do
   end
 
   def load(%Computer{memory: memory} = c, location, values) do
-    Map.put(c, :memory, Memory.load(memory, location, values))
+    memory =
+      values
+      |> Enum.with_index()
+      |> Enum.reduce(memory, fn {value, i}, acc ->
+        Task.start(__MODULE__, :notify_io_subscribers, [c, location + i, value])
+
+        Memory.set(acc, location + i, value)
+      end)
+
+    Map.put(c, :memory, memory)
   end
 
   def step(%Computer{} = c) do
@@ -116,12 +126,29 @@ defmodule Ex6502.Computer do
   def step_pc(%Computer{break: true} = c, _), do: c
 
   def step_pc(%Computer{cpu: cpu} = c, amount \\ 1) do
+  def step_pc(%Computer{} = c), do: step_pc(c, 1)
+  def step_pc(%Computer{cpu: cpu} = c, amount) do
     Map.put(c, :cpu, CPU.step_pc(cpu, amount))
   end
 
   def parse(data) when is_binary(data), do: parse(data, [])
   def parse(<<>>, data), do: data
   def parse(<<byte::integer-8, rest::binary>>, data), do: [byte | parse(rest, data)]
+
+  def io_subscribe(%Computer{io_subscribers: subscribers} = c, pid, address_range) do
+    Map.put(c, :io_subscribers, MapSet.put(subscribers, {pid, address_range}))
+  end
+
+  def notify_io_subscribers(%Computer{io_subscribers: subscribers}, location, value) do
+    subscribers
+    |> Stream.filter(fn {_pid, address_range} ->
+      location in address_range
+    end)
+    |> Stream.each(fn {pid, _} ->
+      send(pid, {:io_change, location, value})
+    end)
+    |> Stream.run()
+  end
 
   defp put_pc_on_address_bus(%Computer{cpu: %{pc: pc}} = c) do
     Map.put(c, :address_bus, pc)
