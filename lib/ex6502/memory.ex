@@ -80,24 +80,21 @@ defmodule Ex6502.Memory do
   end
 
   def dump(%Computer{memory: memory}, length \\ 0xFFFF) do
-    memory
-    |> Stream.chunk_every(16)
-    |> Stream.with_index()
-    |> Stream.map(fn {[first | _] = line, index} ->
-      bytes =
-        line
-        |> Enum.map(fn offset ->
-          :io_lib.format("~2.16.0B", [offset])
+    tasks =
+      memory
+      |> Stream.chunk_every(16)
+      |> Stream.with_index()
+      |> Stream.map(fn {line, index} ->
+        Task.async(fn ->
+          :io_lib.format(
+            "~4.16.0B | ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B ~2.16.0B\n",
+            [index * 16 | line]
+          )
         end)
-        |> Enum.join(" ")
+      end)
+      |> Enum.take(length)
 
-      line =
-        :io_lib.format("~4.16.0B | ", [index * 16])
-        |> IO.chardata_to_string()
-
-      line <> bytes <> "\n"
-    end)
-    |> Stream.take(length)
+    Task.await_many(tasks)
   end
 
   defp ensure_all_are_8_bit(values) do
