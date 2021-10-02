@@ -15,9 +15,9 @@ defmodule Ex6502.CPU.Executor.EOR do
      A EOR M -> A                     N Z C I D V
                                       + + - - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
-     immidiate     EOR #oper     49    2     2
+     immediate     EOR #oper     49    2     2
      zeropage      EOR oper      45    2     3
      zeropage,X    EOR oper,X    55    2     4
      absolute      EOR oper      4D    3     4

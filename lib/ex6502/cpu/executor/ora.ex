@@ -12,12 +12,12 @@ defmodule Ex6502.CPU.Executor.ORA do
 
   ORA  Exclusive-OR Memory with Accumulator
 
-     A ORA M -> A                     N Z C I D V
-                                      + + - - - -
+     A ORA M -> A                      N Z C I D V
+                                       + + - - - -
 
-     addressing    assembler    opc  bytes  cyles
-     --------------------------------------------
-     immidiate     ORA #oper     09    2     2
+     addressing    assembler    opc  bytes  cycles
+     ---------------------------------------------
+     immediate     ORA #oper     09    2     2
      zeropage      ORA oper      05    2     3
      zeropage,X    ORA oper,X    15    2     4
      absolute      ORA oper      0D    3     4

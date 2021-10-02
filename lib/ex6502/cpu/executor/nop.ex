@@ -16,7 +16,7 @@ defmodule Ex6502.CPU.Executor.NOP do
 
   """
 
-  alias Ex6502.{Computer, CPU}
+  alias Ex6502.Computer
 
   # addressing       assembler    opc  bytes  cycles
   # implied          NOP          EA     1      2

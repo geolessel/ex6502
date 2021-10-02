@@ -15,7 +15,7 @@ defmodule Ex6502.CPU.Executor.LSR do
      0 -> [76543210] -> C             N Z C I D V
                                       0 + + - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      accumulator   LSR A         4A    1     2
      zeropage      LSR oper      46    2     5

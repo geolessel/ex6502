@@ -106,6 +106,6 @@ defmodule Ex6502.CPU do
   defp set_flag?(%Computer{}, :c, value) when value in [1, true],
     do: true
 
-  defp set_flag?(%Computer{}, :c, value),
+  defp set_flag?(%Computer{}, :c, _value),
     do: false
 end

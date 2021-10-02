@@ -16,7 +16,7 @@ defmodule Ex6502.CPU.Executor.TSB do
      A TSB M -> A                     N Z C I D V
                                       - + - - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      absolute      TSB oper      0C    3     6
      zeropage      TSB oper      04    2     5

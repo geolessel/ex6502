@@ -11,7 +11,6 @@ defmodule Ex6502.CPU.Executor.TXATest do
         |> TXA.execute()
 
       assert c.cpu.a == 0x99
-      assert c.cpu.pc == 1
     end
   end
 

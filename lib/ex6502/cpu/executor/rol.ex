@@ -16,7 +16,7 @@ defmodule Ex6502.CPU.Executor.ROL do
      C <- [76543210] <- C             N Z C I D V
                                       + + + - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      accumulator   ROL A         2A    1     2
      zeropage      ROL oper      26    2     5

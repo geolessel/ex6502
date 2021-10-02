@@ -11,7 +11,6 @@ defmodule Ex6502.CPU.Executor.TXSTest do
         |> TXS.execute()
 
       assert c.cpu.sp == 0x99
-      assert c.cpu.pc == 1
     end
   end
 end

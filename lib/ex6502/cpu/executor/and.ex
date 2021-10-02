@@ -8,21 +8,22 @@ defmodule Ex6502.CPU.Executor.AND do
 
   ## Table
 
-  AND  AND Memory with Accumulator
+      AND | AND Memory with Accumulator
+      ================================================
 
-     A AND M -> A                     N Z C I D V
-                                      + + - - - -
+      A AND M -> A                     N V - B D I Z C
+                                       +           +
 
-     addressing    assembler    opc  bytes  cyles
-     --------------------------------------------
-     immidiate     AND #oper     29    2     2
-     zeropage      AND oper      25    2     3
-     zeropage,X    AND oper,X    35    2     4
-     absolute      AND oper      2D    3     4
-     absolute,X    AND oper,X    3D    3     4*
-     absolute,Y    AND oper,Y    39    3     4*
-     (indirect,X)  AND (oper,X)  21    2     6
-     (indirect),Y  AND (oper),Y  31    2     5*
+      addressing      assembler      opc  bytes cycles
+      ------------------------------------------------
+      immediate       AND #oper       29    2     2
+      zeropage        AND oper        25    2     3
+      zeropage,X      AND oper,X      35    2     4
+      absolute        AND oper        2D    3     4
+      absolute,X      AND oper,X      3D    3     4*
+      absolute,Y      AND oper,Y      39    3     4*
+      (indirect,X)    AND (oper,X)    21    2     6
+      (indirect),Y    AND (oper),Y    31    2     5*
 
   ## Flags
 

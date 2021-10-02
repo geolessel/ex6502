@@ -3,7 +3,7 @@
 Ex6502 is an emulation of the famous 6502 processor that was used in classic
 computers of the 80s such as the Apple II series, Commodore 64, Atari 2600,
 Nintendo Entertainment System (NES), and countless others. It is still being
-manufactured by the millions anually, and this emulation is targeting the modern
+manufactured by the millions anually and this emulation is targeting the modern
 versions of the CPU (65c02, W65C02S, etc.).
 
 ## Installation, documentation, and usage
@@ -48,7 +48,7 @@ following:
    ```elixir
    c =
      Ex6502.Computer.init()                               # initializes a Computer
-     |> Ex6502.Computer.load_file("your-assembed-file")   # loads your program code into memory
+     |> Ex6502.Computer.load_file("your-assembled-file")  # loads your program code into memory
      |> Ex6502.Computer.reset()                           # uses the 6502's reset vector to load the program counter
    ```
 
@@ -94,14 +94,15 @@ Here's a small list of things to remember.
 * As in the real CPU, the stack pointer is initialized to `0xFF`. However, since
   the stack lives in the address range of `0x0100` to `0x01FF`, the stack
   actually starts at address `0x01FF` and grows downwards towards `0x0100`. I
-  would recommend against using any of those locations for program code or data.
+  would recommend against using any of those locations for program code or data
+  unless you know what you are doing.
 
 * Currently, when the emulator encounters a `BRK` command (`0x00`) it does what
-  the hardware does. Specifically, it pushes the high byte of the current
-  address, then the low byte of the current address, then the current status
-  register with the `B` flag set. After this, it sets the program counter to the
-  "interrupt vector" address (`0xFFFE`). The emulator also stops the CPU and
-  currently cannot continue automatically (though you can manually point the
+  the hardware does. Specifically, it pushes onto the stack the high byte of the
+  current address, then the low byte of the current address, then the current
+  status register with the `B` flag set. After this, it sets the program counter
+  to the "interrupt vector" address (`0xFFFE`). The emulator also stops the CPU
+  and currently cannot continue automatically (though you can manually point the
   program counter anywhere you'd like at this point).
 
 ## Background
@@ -168,17 +169,21 @@ what you've created.
 * [ ] correct operation tables for each opcode
 * [ ] refactor earliest operation implementations
 * [ ] correctly count cycles used during processing
-* [ ] time-correct emulation of the CPU (running at original speeds such as 1MHz, but also configurable)
+* [ ] time-correct emulation of the CPU (running at original speeds such as
+      1MHz, but also configurable)
 * [ ] handle continuation from `BRK` interrupts
 * [ ] emulate hardware interrupts
 * [ ] basic assembler?
-* [ ] better tests using named [named setups](https://mreigen.medium.com/elixir-a-cleaner-way-to-organize-tests-using-exunits-named-setup-8abb43971ca4)?
+* [ ] better tests using named [named
+      setups](https://mreigen.medium.com/elixir-a-cleaner-way-to-organize-tests-using-exunits-named-setup-8abb43971ca4)?
 
 ## Me
 
 Contact me any time! I'm [@geolessel](https://twitter.com/geolessel) on twitter,
 "geo" in the Elixir Slack community, and
-[geo](https://elixirforum.com/u/geo/summary) on elixirforum.com.
+[geo](https://elixirforum.com/u/geo/summary) on elixirforum.com. I've given a
+number of talks at conferences (about Elixir mostly) and you can check those out
+on my [Talks I've Given Playlist on YouTube](https://www.youtube.com/playlist?list=PLydu3IE1lef2Po9GJWjL9zl1X4xAPphTM).
 
 If you like my work and want to support me, feel free to buy my book, [Phoenix
 in Action](http://phoenixinaction.com) from Manning Publishing. If you already

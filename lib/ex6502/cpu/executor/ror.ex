@@ -16,7 +16,7 @@ defmodule Ex6502.CPU.Executor.ROR do
      C -> [76543210] -> C             N Z C I D V
                                       + + + - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      accumulator   ROR A         6A    1     2
      zeropage      ROR oper      66    2     5

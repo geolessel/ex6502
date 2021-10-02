@@ -15,7 +15,7 @@ defmodule Ex6502.CPU.Executor.ASL do
      C <- [76543210] <- 0             N Z C I D V
                                       + + + - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      accumulator   ASL A         0A    1     2
      zeropage      ASL oper      06    2     5

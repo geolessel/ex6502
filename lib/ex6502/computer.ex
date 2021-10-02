@@ -100,7 +100,7 @@ defmodule Ex6502.Computer do
 
   def put_next_byte_on_data_bus(%Computer{cpu: cpu, memory: memory} = c) do
     c
-    |> Map.put(:data_bus, Enum.at(memory, cpu.pc))
+    |> Map.put(:data_bus, Memory.get(memory, cpu.pc))
     |> step_pc()
   end
 
@@ -123,10 +123,10 @@ defmodule Ex6502.Computer do
 
   def resolve_address([low, high]), do: (high <<< 8) + low
 
+  def step_pc(%Computer{} = c), do: step_pc(c, 1)
+
   def step_pc(%Computer{break: true} = c, _), do: c
 
-  def step_pc(%Computer{cpu: cpu} = c, amount \\ 1) do
-  def step_pc(%Computer{} = c), do: step_pc(c, 1)
   def step_pc(%Computer{cpu: cpu} = c, amount) do
     Map.put(c, :cpu, CPU.step_pc(cpu, amount))
   end
@@ -158,7 +158,7 @@ defmodule Ex6502.Computer do
 
   defp update_data_bus_from_address_bus(%Computer{address_bus: address, memory: memory} = c) do
     c
-    |> Map.put(:data_bus, Enum.at(memory, address))
+    |> Map.put(:data_bus, Memory.get(memory, address))
   end
 
   defp handle_interrupt_location(%Computer{cpu: %{pc: pc}} = c) when pc in [0xFFFC, 0xFFFE] do

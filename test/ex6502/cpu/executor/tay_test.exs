@@ -11,7 +11,6 @@ defmodule Ex6502.CPU.Executor.TAYTest do
         |> TAY.execute()
 
       assert c.cpu.y == 0x99
-      assert c.cpu.pc == 1
     end
   end
 

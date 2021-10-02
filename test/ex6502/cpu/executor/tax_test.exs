@@ -11,7 +11,6 @@ defmodule Ex6502.CPU.Executor.TAXTest do
         |> TAX.execute()
 
       assert c.cpu.x == 0x99
-      assert c.cpu.pc == 1
     end
   end
 

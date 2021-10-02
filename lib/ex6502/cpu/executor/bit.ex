@@ -19,7 +19,7 @@ defmodule Ex6502.CPU.Executor.BIT do
      A AND M, M7 -> N, M6 -> V        N Z C I D V
                                      M7 + - - - M6
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      immediate     BIT #oper     89    2     3
      absolute      BIT oper      2C    3     4

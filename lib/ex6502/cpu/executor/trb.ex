@@ -16,7 +16,7 @@ defmodule Ex6502.CPU.Executor.TRB do
      A TRB M -> A                     N Z C I D V
                                       - + - - - -
 
-     addressing    assembler    opc  bytes  cyles
+     addressing    assembler    opc  bytes cycles
      --------------------------------------------
      zeropage      TRB oper      14    2     6
      absolute      TRB oper      1C    3     5
