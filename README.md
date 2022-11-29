@@ -1,10 +1,12 @@
-# Ex6502
+# Ex6502 - 6502 Processor Emulator in Elixir
 
 Ex6502 is an emulation of the famous 6502 processor that was used in classic
 computers of the 80s such as the Apple II series, Commodore 64, Atari 2600,
 Nintendo Entertainment System (NES), and countless others. It is still being
 manufactured by the millions anually and this emulation is targeting the modern
 versions of the CPU (65c02, W65C02S, etc.).
+
+[![justforfunnoreally.dev badge](https://img.shields.io/badge/justforfunnoreally-dev-9ff)](https://justforfunnoreally.dev)
 
 ## Installation, documentation, and usage
 
